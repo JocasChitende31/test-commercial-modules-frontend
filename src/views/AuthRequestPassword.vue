@@ -7,17 +7,24 @@
 import { ref } from 'vue'
 import { authService } from '@/services/authentication'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 const sessionEmail = ref('')
 const passsword = ref('')
 const router = useRoute()
+const route = useRouter()
 
 sessionEmail.value = sessionStorage.getItem('isValidEmail')
 const reuqestSessionPassword = async () => {
   const token = router.query.token
-  console.log('token-->', token)
   const email = sessionStorage.getItem('isValidEmail')
   const response = await authService.requestPassword(token, email, passsword.value)
-  console.log('passowrd: -->', response)
+  console.log('response_passowrd: -->', response)
+  const tokenSession = response.data.session.token
+  console.log('token--->', tokenSession)
+  sessionStorage.setItem('token', tokenSession.token)
+  sessionStorage.removeItem('isValidEmail')
+  sessionStorage.removeItem('urlToken')
+  route.push('/')
 }
 </script>
 <template>
