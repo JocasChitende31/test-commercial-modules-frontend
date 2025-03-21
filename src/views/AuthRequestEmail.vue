@@ -8,20 +8,26 @@ import { ref } from 'vue'
 import { authService } from '@/services/authentication'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const isEmail = ref(false)
 const email = ref('')
+const message = ref('')
 
 const reuqestSessionEmail = async () => {
   if (email.value) {
-    const response = await authService.requestEmail(email.value)
-    if (response.data.userEmail) {
-      sessionStorage.setItem('isValidEmail', response.data.userEmail)
-      const token = response.data.urlTokenSession
-      router.push({
-        path: '/request-password',
-        query: { token },
+    await authService
+      .requestEmail(email.value)
+      .then((response) => {
+        sessionStorage.setItem('isValidEmail', response.data.userEmail)
+        const token = response.data.urlTokenSession
+        router.push({
+          path: '/request-password',
+          query: { token },
+        })
       })
-    }
+      .catch((e) => {
+        message.value = 'Email não encontrado ou inválido.'
+      })
+  } else {
+    message.value = 'Digite o email e tente novamente.'
   }
 }
 </script>
@@ -48,9 +54,8 @@ const reuqestSessionEmail = async () => {
               <div class="card-body">
                 <div class="pt-4 pb-2">
                   <h5 class="card-title text-center pb-0 fs-4">Acessar o Sistema</h5>
-                  <p v-show="isEmail" class="text-center small">{{ isValidEmail }}</p>
-                  <p v-show="!isEmail" class="text-center small">Digitar o seu Email</p>
-                  <p v-show="isEmail" class="text-center small">Digite a sua Palavra-passe</p>
+                  <p class="text-center small">Digitar o seu Email</p>
+                  <p class="text-left text-danger pt-2 mb-0 small">{{ message }}</p>
                 </div>
                 <form
                   class="row g-3 needs-validation"

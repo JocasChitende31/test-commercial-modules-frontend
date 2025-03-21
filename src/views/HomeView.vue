@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { tenantInfos } from '@/services/tenant_perfil'

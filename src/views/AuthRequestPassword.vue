@@ -12,19 +12,30 @@ const sessionEmail = ref('')
 const passsword = ref('')
 const router = useRoute()
 const route = useRouter()
+const message = ref('')
 
 sessionEmail.value = sessionStorage.getItem('isValidEmail')
 const reuqestSessionPassword = async () => {
   const token = router.query.token
   const email = sessionStorage.getItem('isValidEmail')
-  const response = await authService.requestPassword(token, email, passsword.value)
-  console.log('response_passowrd: -->', response)
-  const tokenSession = response.data.session.token
-  console.log('token--->', tokenSession)
-  sessionStorage.setItem('token', tokenSession.token)
-  sessionStorage.removeItem('isValidEmail')
-  sessionStorage.removeItem('urlToken')
-  route.push('/')
+  if (passsword.value) {
+    await authService
+      .requestPassword(token, email, passsword.value)
+      .then((response) => {
+        const tokenSession = response.data.session.token
+        console.log('token--->', response)
+        sessionStorage.setItem('token', tokenSession.token)
+        sessionStorage.removeItem('isValidEmail')
+        sessionStorage.removeItem('urlToken')
+        route.push('/')
+      })
+      .catch((e) => {
+        console.log('error->', e)
+        message.value = 'Palavra-passe ou token inválido'
+      })
+  } else {
+    message.value = 'Digite a palavra-pase e tente novamente.'
+  }
 }
 </script>
 <template>
@@ -50,8 +61,9 @@ const reuqestSessionPassword = async () => {
               <div class="card-body">
                 <div class="pt-4 pb-2">
                   <h5 class="card-title text-center pb-0 fs-4">Acessar o Sistema</h5>
-                  <p class="text-center small">{{ sessionEmail }}</p>
                   <p class="text-center small">Digite a sua Palavra-passe</p>
+                  <p class="text-center text-success mb-2 small">{{ sessionEmail }}</p>
+                  <p class="text-left text-danger pt-1 mb-0 small">{{ message }}</p>
                 </div>
                 <form
                   class="row g-3 needs-validation"
@@ -70,6 +82,7 @@ const reuqestSessionPassword = async () => {
                         placeholder="Palavra-passe"
                         id="yourPassword"
                         v-model="passsword"
+                        required
                       />
                       <div class="invalid-feedback">Por favor, entre com o sua passe</div>
                     </div>
