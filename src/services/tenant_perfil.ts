@@ -7,6 +7,10 @@ export class TenantInfos {
     const response = await http.get('/info-company')
     return response
   }
+  async checkTenantModule(): Promise<any> {
+    const response = await http.get('/tenant/check-tenant-modules')
+    return response
+  }
 }
 
 export const tenantInfos = new TenantInfos()
